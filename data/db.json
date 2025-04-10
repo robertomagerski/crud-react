@@ -1,0 +1,9 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "nome": "Pc Gamer",
+      "price": 2000.0
+    }
+  ]
+}
