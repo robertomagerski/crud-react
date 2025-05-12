@@ -1,33 +1,43 @@
+// Components
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Button } from "@/components/ui/button";
-
 import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
+import { useFetch } from "@/hooks/useFetch";
+import { useState } from "react";
 
-const produtos = [
-  { id: 1, nome: "Camiseta", preco: 49.9 },
-  { id: 2, nome: "Calça Jeans", preco: 89.9 },
-  { id: 3, nome: "Tênis", preco: 129.9 },
-];
-
-// const url = "http://localhost:3000/products"
+const url = "http://localhost:3000/produtos";
 
 const Home = () => {
+  const [name, setName] = useState("");
+  const [price, setPrice] = useState(Number);
+
+  const {
+    data: items,
+    httpConfig,
+    error,
+  } = useFetch("http://localhost:3000/produtos");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const product = {name: "", price: Number(price) };
+    httpConfig(product, "POST");
+  };
   return (
     <div>
       <div className="flex justify-start align-center gap-5 shadow-xl h-12   ">
         <DropdownMenu>
           <DropdownMenuTrigger>
-          <button className="p-2 rounded-md hover:bg-muted">
-          <Menu className="w-5 h-5" />
-        </button>
+            <button className="p-2 rounded-md hover:bg-muted">
+              <Menu className="w-5 h-5" />
+            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
@@ -42,41 +52,41 @@ const Home = () => {
       </div>
 
       <div>
-      <table className="min-w-full text-sm text-left">
-        <thead className="bg-muted text-muted-foreground">
-          <tr>
-            <th className="px-6 py-3">ID</th>
-            <th className="px-6 py-3">Nome</th>
-            <th className="px-6 py-3">Preço</th>
-            <th className="px-6 py-3 text-center">Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          {produtos.map((produto) => (
-            <tr key={produto.id} className="border-t">
-              <td className="px-6 py-4">{produto.id}</td>
-              <td className="px-6 py-4">{produto.nome}</td>
-              <td className="px-6 py-4">R$ {produto.preco.toFixed(2)}</td>
-              <td className="px-6 py-4 text-center space-x-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => alert(`Editar ${produto.nome}`)}
-                >
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => alert(`Deletar ${produto.nome}`)}
-                >
-                  <Trash2 className="w-4 h-4 text-red-500" />
-                </Button>
-              </td>
+        <table className="min-w-full text-sm text-left">
+          <thead className="bg-muted text-muted-foreground">
+            <tr>
+              <th className="px-6 py-3">ID</th>
+              <th className="px-6 py-3">Nome</th>
+              <th className="px-6 py-3">Preço</th>
+              <th className="px-6 py-3 text-center">Ações</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items && items.map((item) => (
+              <tr key={item.id} className="border-t">
+                <td className="px-6 py-4">{item.id}</td>
+                <td className="px-6 py-4">{item.name}</td>
+                <td className="px-6 py-4">R$ {item.price.toFixed(2)}</td>
+                <td className="px-6 py-4 text-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => alert(`Editar ${item.name}`)}
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => alert(`Deletar ${item.name}`)}
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
