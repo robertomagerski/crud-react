@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 export type Product = {
     id?: number,
@@ -60,8 +61,11 @@ export const useFetch = (url: string) => {
 
       setData((prevData) => prevData?.filter((item) => item.id !== id) || null);
 
+      toast.success("Produto deletado com sucesso");
+
     } catch (error: any) {
       setError(error.message);
+      toast.error("Erro ao deletar produto");
 
     } finally {
       setLoading(false);
