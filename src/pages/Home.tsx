@@ -10,45 +10,50 @@ import { Menu } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 import { useFetch } from "@/hooks/useFetch";
-import { useState } from "react";
+import React from "react";
 
-const url = "http://localhost:3000/produtos";
+const url = "http://localhost:3000/products";
 
 const Home = () => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState(Number);
 
-  const {
-    data: items,
-    httpConfig,
-    error,
-  } = useFetch("http://localhost:3000/produtos");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
 
-    const product = {name: "", price: Number(price) };
-    httpConfig(product, "POST");
+  const [name, setName] = React.useState("");
+  const [price, setPrice] = React.useState<number | "">("");
+
+  const { data: items, postData, deleteData, loading, error } = useFetch(url);
+
+  const handleRemove = (id: number) => {
+    deleteData(id);
+    alert(`Produto ${id} deletado com sucesso`);
   };
+
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   const newProduct: Product = {
+  //     name,
+  //     price: Number(price),
+  //   };
+  //   postData(newProduct);
+  // };
+
   return (
     <div>
-      <div className="flex justify-start align-center gap-5 shadow-xl h-12   ">
+      <div className=" align-center gap-5 shadow-xl h-12  flex items-center justify-start ">
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <button className="p-2 rounded-md hover:bg-muted">
               <Menu className="w-5 h-5" />
-            </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem>
               <Link to={"/criarproduto"}>Criar Produto</Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link to={"/deletarproduto"}>Deletar Produto</Link>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <h1 className="flex items-center justify-center font-bold">Produtos</h1>
+        <h1 className="flex items-center justify-center font-bold">
+          {" "}
+          Lista Produtos
+        </h1>
       </div>
 
       <div>
@@ -62,29 +67,34 @@ const Home = () => {
             </tr>
           </thead>
           <tbody>
-            {items && items.map((item) => (
-              <tr key={item.id} className="border-t">
-                <td className="px-6 py-4">{item.id}</td>
-                <td className="px-6 py-4">{item.name}</td>
-                <td className="px-6 py-4">R$ {item.price.toFixed(2)}</td>
-                <td className="px-6 py-4 text-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => alert(`Editar ${item.name}`)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => alert(`Deletar ${item.name}`)}
-                  >
-                    <Trash2 className="w-4 h-4 text-red-500" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
+            {items &&
+              items.map((item) => (
+                <tr key={item.id} className="border-t">
+                  <td className="px-6 py-4">{item.id}</td>
+                  <td className="px-6 py-4">{item.name}</td>
+                  <td className="px-6 py-4">R$ {item.price.toFixed(2)}</td>
+                  <td className="px-6 py-4 text-center space-x-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => alert(`Editar ${item.name}`)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        if (item.id !== undefined) {
+                          handleRemove(item.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>

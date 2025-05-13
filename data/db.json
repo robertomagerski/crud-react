@@ -1,9 +1,14 @@
 {
   "products": [
     {
-      "id": 1,
-      "nome": "Pc Gamer",
-      "price": 2000.0
+      "id": "2",
+      "name": "Pc Gamer 2",
+      "price": 2500
+    },
+    {
+      "id": "3",
+      "name": "Pc Gamer 3",
+      "price": 3000
     }
   ]
 }
