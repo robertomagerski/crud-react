@@ -1,53 +1,53 @@
+import { BookDashed } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export type Product = {
-    id?: number,
-    name: string,
-    price: number
-  };
-
+  id?: number;
+  name: string;
+  price: number;
+};
 
 export const useFetch = (url: string) => {
   const [data, setData] = useState<Product[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading]= useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
   const fetchData = async () => {
-  setLoading(true);
-  try {
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error("Erro ao buscar produtos");
+    setLoading(true);
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        throw new Error("Erro ao buscar produtos");
+      }
+      const json = await res.json();
+      setData(json);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
     }
-    const json = await res.json();
-    setData(json);
-  } catch (error: any) {
-    setError(error.message);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const postData = async (product: Product) => {
-    setLoading(true)
+    setLoading(true);
     try {
       const res = await fetch(url, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(product)
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(product),
       });
 
       const newProduct = await res.json();
-      setData((prevData) => (prevData ? [...prevData, newProduct] : [newProduct]));	
-
-    } catch(error){ 
-
-      console.log(error)
+      setData((prevData) =>
+        prevData ? [...prevData, newProduct] : [newProduct]
+      );
+    } catch (error) {
+      console.log(error);
     }
-    setLoading(false)
+    setLoading(false);
   };
-  
+
   const deleteData = async (id: number) => {
     setLoading(true);
     try {
@@ -57,28 +57,58 @@ export const useFetch = (url: string) => {
 
       if (!res.ok) {
         throw new Error("Erro ao deletar produto");
-      } 
-
-      setData((prevData) => prevData?.filter((item) => item.id !== id) || null);
-
+      }
+      setData((prevData) =>
+        prevData ? prevData.filter((item) => item.id !== id) : []
+      );
       toast.success("Produto deletado com sucesso");
-
     } catch (error: any) {
       setError(error.message);
       toast.error("Erro ao deletar produto");
-
     } finally {
       setLoading(false);
-    };
-    
-    
-  }
-  useEffect(() => {
-    if (url) {
-      fetchData();
-    } else {
-      console.error("URL não fornecida");
     }
-  }, [url]);
-return { data, loading, error, postData, refetch: fetchData, deleteData };
+  };
+  const putData = async (id: number, updateProduct: Product) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${url}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateProduct),
+      });
+
+      if (!res.ok) {
+        throw new Error("Erro ao editar produto");
+      }
+      const update = await res.json();
+
+      setData((prevData) =>
+        prevData
+          ? prevData.map((item) => (item.id === id ? update : item))
+          : [update]
+      );
+    } catch (error: any) {
+      setError(error.message);
+      toast.error("Erro ao editar produto");
+    } finally {
+      setLoading(false);
+    }
+    useEffect(() => {
+      if (url) {
+        fetchData();
+      } else {
+        console.error("URL não fornecida");
+      }
+    }, [url]);
+    return {
+      data,
+      loading,
+      error,
+      postData,
+      refetch: fetchData,
+      deleteData,
+      putData,
+    };
+  };
 };

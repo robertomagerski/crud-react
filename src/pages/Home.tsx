@@ -3,7 +3,6 @@ import { useState } from "react";
 
 // UI
 
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,10 +14,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { Pencil, Trash2 } from "lucide-react";
 import {
   Dialog,
@@ -28,7 +25,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
+import { NumericFormat } from "react-number-format";
 
 //Components
 import { useFetch } from "@/hooks/useFetch";
@@ -37,40 +35,61 @@ const url = "http://localhost:3000/products";
 
 const Home = () => {
   const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState<number>(0);
 
   const { data: items, deleteData, postData } = useFetch(url);
 
-  const handleRemove = (id: number) => {
+  const handleRemove = (id: number, e?: React.MouseEvent) => {
     deleteData(id);
+    e?.preventDefault();
   };
+
+  const newProduct = { name, price: Number(price) };
+
+  const clearSubmit = () => {
+    setName("");
+    setPrice(0);
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
+  };
+
   return (
     <div>
       <div className=" align-center gap-5 shadow-xl h-12  flex items-center justify-start ">
         <h1 className="flex items-center justify-center font-bold m-5">
-          Lista Produtos
+          Lista de Produtos
         </h1>
       </div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button className="m-4 bg-green-500" type="button">Criar Produto</Button>
+          <Button
+            className="m-4 bg-green-500"
+            type="button"
+            onClick={() => clearSubmit()}
+          >
+            Criar Produto
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Novo Produto</DialogTitle>
           </DialogHeader>
           <DialogDescription>
-        Preencha os campos abaixo para adicionar um novo produto.
-      </DialogDescription>
+            Preencha os campos abaixo para adicionar um novo produto.
+          </DialogDescription>
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const newProduct = { name, price: Number(price) };
               postData(newProduct);
               setName("");
-              setPrice("");
+              setPrice(0);
             }}
-            className="space-y-4"
+            className="space-y-4 relative w-full"
           >
             <input
               type="text"
@@ -80,18 +99,27 @@ const Home = () => {
               className="w-full p-2 border border-gray-300 rounded-md"
               required
             />
-            <input
-              type="number"
-              placeholder="Preço"
+            <NumericFormat
+              thousandSeparator="."
+              decimalSeparator=","
+              prefix="R$ "
+              decimalScale={2}
+              fixedDecimalScale
+              allowNegative={false}
+              placeholder="R$"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onValueChange={(values) => {
+                setPrice(values.floatValue || 0);
+              }}
               className="w-full p-2 border border-gray-300 rounded-md"
               required
             />
 
             <DialogFooter>
               {/* <Button type="submit" className="bg-red-500 hover:bg-red-700">Cancelar</Button> */}
-              <Button type="submit" className="bg-green-500 hover:bg-green-700">Salvar</Button>
+              <Button type="submit" className="bg-green-500 hover:bg-green-700">
+                Criar
+              </Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -114,7 +142,7 @@ const Home = () => {
                 <tr key={item.id} className="border-b ">
                   <td className="px-6 py-4">{item.id}</td>
                   <td className="px-6 py-4">{item.name}</td>
-                  <td className="px-6 py-4">R$ {item.price.toFixed(2)}</td>
+                  <td className="px-6 py-4">{formatCurrency(item.price)}</td>
                   <td className="px-6 py-4 border-r-2 text-center space-x-2">
                     <Button
                       variant="ghost"
@@ -143,7 +171,9 @@ const Home = () => {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
+                            className="bg-red-500 hover:bg-red-700"
                             onClick={() => handleRemove(item.id!)}
+                            type="button"
                           >
                             Confirmar
                           </AlertDialogAction>

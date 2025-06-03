@@ -1,30 +1,24 @@
 {
   "products": [
     {
-      "id": "1",
-      "name": "Product 1",
-      "description": "Description for Product 1",
-      "price": 10.99
+      "id": "203c",
+      "name": "Computador",
+      "price": 555
     },
     {
-      "id": "2",
-      "name": "Product 2",
-      "price": 20.99
+      "id": "83ac",
+      "name": "Tela",
+      "price": 1500
     },
     {
-      "id": "3",
-      "name": "Product 3",
-      "price": 30.99
+      "id": "8306",
+      "name": "Mouse",
+      "price": 400
     },
     {
-      "id": "4",
-      "name": "Product 4",
-      "price": 30.99
-    },
-    {
-      "id": "2fb1",
-      "name": "cpu",
-      "price": 500
+      "id": "bee3",
+      "name": "Teclado",
+      "price": 400
     }
   ]
 }
