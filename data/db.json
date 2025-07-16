@@ -1,14 +1,9 @@
 {
   "products": [
     {
-      "id": "203c",
-      "name": "Computador",
-      "price": 555
-    },
-    {
-      "id": "83ac",
       "name": "Tela",
-      "price": 1500
+      "price": 1400,
+      "id": "83ac"
     },
     {
       "id": "8306",
@@ -19,6 +14,11 @@
       "id": "bee3",
       "name": "Teclado",
       "price": 400
+    },
+    {
+      "id": "fefd",
+      "name": "roberto",
+      "price": 50
     }
   ]
 }

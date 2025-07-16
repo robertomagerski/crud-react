@@ -87,12 +87,17 @@ export const useFetch = (url: string) => {
           ? prevData.map((item) => (item.id === id ? update : item))
           : [update]
       );
+
+      toast.success("Produto editado com sucesso");
+
     } catch (error: any) {
       setError(error.message);
       toast.error("Erro ao editar produto");
     } finally {
       setLoading(false);
     }
+    };
+    
     useEffect(() => {
       if (url) {
         fetchData();
@@ -110,4 +115,3 @@ export const useFetch = (url: string) => {
       putData,
     };
   };
-};

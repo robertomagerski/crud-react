@@ -2,7 +2,6 @@
 import { useState } from "react";
 
 // UI
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,7 +36,12 @@ const Home = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState<number>(0);
 
-  const { data: items, deleteData, postData } = useFetch(url);
+  // ESTADOS PARA EDIÇÃO
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPrice, setEditPrice] = useState<number>(0);
+
+  const { data: items, deleteData, postData, putData } = useFetch(url);
 
   const handleRemove = (id: number, e?: React.MouseEvent) => {
     deleteData(id);
@@ -51,16 +55,16 @@ const Home = () => {
     setPrice(0);
   };
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
+  // Função para preencher o produto que vai ser editado
+  const handleEditClick = (item: any) => {
+    setEditId(item.id);
+    setEditName(item.name);
+    setEditPrice(item.price);
   };
 
   return (
     <div>
-      <div className=" align-center gap-5 shadow-xl h-12  flex items-center justify-start ">
+      <div className="align-center gap-5 shadow-xl h-12 flex items-center justify-start">
         <h1 className="flex items-center justify-center font-bold m-5">
           Lista de Produtos
         </h1>
@@ -116,7 +120,6 @@ const Home = () => {
             />
 
             <DialogFooter>
-              {/* <Button type="submit" className="bg-red-500 hover:bg-red-700">Cancelar</Button> */}
               <Button type="submit" className="bg-green-500 hover:bg-green-700">
                 Criar
               </Button>
@@ -124,6 +127,7 @@ const Home = () => {
           </form>
         </DialogContent>
       </Dialog>
+
       <div>
         <table className="min-w-full text-sm text-left">
           <thead className="bg-muted text-muted-foreground">
@@ -142,15 +146,74 @@ const Home = () => {
                 <tr key={item.id} className="border-b ">
                   <td className="px-6 py-4">{item.id}</td>
                   <td className="px-6 py-4">{item.name}</td>
-                  <td className="px-6 py-4">{formatCurrency(item.price)}</td>
+                  <td className="px-6 py-4">R$ {item.price} </td>
                   <td className="px-6 py-4 border-r-2 text-center space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => alert(`Editar ${item.name}`)}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </Button>
+                    
+                    {/* ===== BOTÃO EDITAR ===== */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEditClick(item)}
+                        >
+                          <Pencil className="w-4 h-4 text-blue-500" />
+                        </Button>
+                      </DialogTrigger>
+
+                      {/* Modal de Edição */}
+                      <DialogContent className="sm:max-w-md">
+                        <DialogHeader>
+                          <DialogTitle>Editar Produto</DialogTitle>
+                          <DialogDescription>
+                            Edite os dados do produto{" "}
+                            <strong>{item.name}</strong>
+                          </DialogDescription>
+                        </DialogHeader>
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            if (editId !== null) {
+                              putData(editId, {
+                                name: editName,
+                                price: editPrice,
+                              });
+                            }
+                          }}
+                          className="space-y-4"
+                        >
+                          <input
+                            type="text"
+                            value={editName}
+                            onChange={(e) => setEditName(e.target.value)}
+                            className="w-full p-2 border rounded"
+                          />
+                          <NumericFormat
+                            thousandSeparator="."
+                            decimalSeparator=","
+                            prefix="R$ "
+                            decimalScale={2}
+                            fixedDecimalScale
+                            allowNegative={false}
+                            value={editPrice}
+                            onValueChange={(values) =>
+                              setEditPrice(values.floatValue || 0)
+                            }
+                            className="w-full p-2 border rounded"
+                          />
+                          <DialogFooter>
+                            <Button
+                              type="submit"
+                              className="bg-blue-500 hover:bg-blue-700"
+                            >
+                              Salvar alterações
+                            </Button>
+                          </DialogFooter>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+
+                    {/* ===== BOTÃO DELETAR ===== */}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="ghost" size="icon">
@@ -172,7 +235,7 @@ const Home = () => {
                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                           <AlertDialogAction
                             className="bg-red-500 hover:bg-red-700"
-                            onClick={() => handleRemove(item.id!)}
+                            onClick={(e) => handleRemove(item.id!, e)}
                             type="button"
                           >
                             Confirmar
